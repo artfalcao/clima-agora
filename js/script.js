@@ -1,6 +1,7 @@
 // Variáveis e Seleção de Elementos
-//const apiKey = "put your own key here"
+const apiKey = "c542d637f0bb5ea25565e80ccec5c662"
 const apiCountryURL = "https://countryflagsapi.com/png/"
+const apiUnsplash = "https://source.unsplash.com/1600x900/?"
 
 const cityInput = document.getElementById("city-input")
 const searchBtn = document.getElementById("search")
@@ -15,6 +16,8 @@ const windElement = document.querySelector("#wind span")
 
 const weatherContainer = document.querySelector("#weather-data")
 
+const errorMessageContainer = document.querySelector("#error-message");
+
 
 //Funções
 const getWeatherData = async(city) => {
@@ -25,12 +28,28 @@ const getWeatherData = async(city) => {
     const data = await res.json()
 
     return data
-
 }
+
+const showErrorMessage = () => {
+    errorMessageContainer.classList.remove("hide")
+  }
+  
+  const hideInformation = () => {
+    errorMessageContainer.classList.add("hide")
+    weatherContainer.classList.add("hide")
+  }
 
 
 const showWeatherData = async (city) => {
+    hideInformation()
+
     const data = await getWeatherData(city)
+
+    //Tratando Error
+    if (data.cod === "404") {
+        showErrorMessage()
+        return;
+    }
 
     cityElement.innerText = data.name
     tempElement.innerText = parseInt(data.main.temp)
@@ -39,6 +58,9 @@ const showWeatherData = async (city) => {
     countryElement.setAttribute("src", apiCountryURL + data.sys.country)
     humidityElement.innerText = `${data.main.humidity}%`
     windElement.innerText = `${data.wind.speed}km/h`
+
+    // Mudar Bg-Image
+    document.body.style.backgroundImage = `url("${apiUnsplash + city}")`
 
     weatherContainer.classList.remove("hide")
 }
